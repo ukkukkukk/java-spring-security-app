@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 
 public class JWTTokenVerifier extends OncePerRequestFilter {
     private final String jwtSecret;
-    private final String BEARER_TOKEN_PREFIX = "Bearer ";
-    private final String AUTHORITIES_CLAIM_FIELD_NAME = "authorities";
+    private final static String BEARER_TOKEN_PREFIX = "Bearer ";
+    private final static String AUTHORITIES_CLAIM_FIELD_NAME = "authorities";
 
     public JWTTokenVerifier(String jwtSecret) {
         this.jwtSecret = jwtSecret;
