@@ -28,7 +28,7 @@ public class StudentController {
 
     @PutMapping("/students/{id}")
     public Student updateStudent(@PathVariable("id") Long id, @RequestBody Student student) {
-        return studentService.updateStudent(student);
+        return studentService.updateStudent(id, student);
     }
 
     @DeleteMapping("/students/{id}")

@@ -26,8 +26,14 @@ public class StudentService {
         return studentRepository.save(newStudent);
     }
 
-    public Student updateStudent(Student student) {
-        return studentRepository.save(student);
+    public Student updateStudent(Long id, Student student) {
+        Student updateStudent = getStudentById(id);
+
+        updateStudent.setFirstName(student.getFirstName());
+        updateStudent.setLastName(student.getLastName());
+        updateStudent.setAge(student.getAge());
+
+        return studentRepository.save(updateStudent);
     }
 
     public void deleteStudent(Long id) {
