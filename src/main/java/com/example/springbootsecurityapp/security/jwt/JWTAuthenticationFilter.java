@@ -2,6 +2,7 @@ package com.example.springbootsecurityapp.security.jwt;
 
 import com.example.springbootsecurityapp.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.net.HttpHeaders;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final AuthenticationManager authenticationManager;
 
     private final String jwtSecret;
+    private final static String BEARER_TOKEN_PREFIX = "Bearer ";
+    private final static String AUTHORITIES_CLAIM_FIELD_NAME = "authorities";
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, String jwtSecret) {
         this.authenticationManager = authenticationManager;
@@ -46,12 +49,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String jwtToken = Jwts.builder()
                 .setSubject(authResult.getName())
-                .claim("authorities", authResult.getAuthorities())
+                .claim(AUTHORITIES_CLAIM_FIELD_NAME, authResult.getAuthorities())
                 .setIssuedAt(Date.from(currentTime))
                 .setExpiration(Date.from(currentTime.plusSeconds(3600)))
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
                 .compact();
 
-        response.addHeader("Authorization", "Bearer " + jwtToken);
+        response.addHeader(HttpHeaders.AUTHORIZATION, BEARER_TOKEN_PREFIX + jwtToken);
     }
 }

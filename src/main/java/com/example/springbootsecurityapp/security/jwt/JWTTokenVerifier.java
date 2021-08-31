@@ -1,6 +1,7 @@
 package com.example.springbootsecurityapp.security.jwt;
 
 import com.google.common.base.Strings;
+import com.google.common.net.HttpHeaders;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 
 public class JWTTokenVerifier extends OncePerRequestFilter {
     private final String jwtSecret;
+    private final String BEARER_TOKEN_PREFIX = "Bearer ";
+    private final String AUTHORITIES_CLAIM_FIELD_NAME = "authorities";
 
     public JWTTokenVerifier(String jwtSecret) {
         this.jwtSecret = jwtSecret;
@@ -30,15 +33,15 @@ public class JWTTokenVerifier extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = httpServletRequest.getHeader("Authorization");
+        String authorizationHeader = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
+        if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(BEARER_TOKEN_PREFIX)) {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
         }
 
         try {
-            String token = authorizationHeader.replace("Bearer ", "");
+            String token = authorizationHeader.replace(BEARER_TOKEN_PREFIX, "");
             Jws<Claims> claimsJws = Jwts.parser()
                     .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
                     .parseClaimsJws(token);
@@ -47,7 +50,7 @@ public class JWTTokenVerifier extends OncePerRequestFilter {
 
             String username = body.getSubject();
 
-            List<Map<String, String>> authorities = (List<Map<String, String>>) body.get("authorities");
+            List<Map<String, String>> authorities = (List<Map<String, String>>) body.get(AUTHORITIES_CLAIM_FIELD_NAME);
 
             List<GrantedAuthority> grantedAuthorities = authorities.stream()
                     .map(authority -> new SimpleGrantedAuthority(authority.get("authority")))

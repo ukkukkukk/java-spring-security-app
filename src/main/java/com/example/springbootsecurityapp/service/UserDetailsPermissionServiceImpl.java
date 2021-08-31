@@ -21,6 +21,7 @@ import static java.lang.String.format;
 public class UserDetailsPermissionServiceImpl implements UserDetailsService {
 
     private final UserService userService;
+    private final static String ROLE_AUTHORITY_PREFIX = "ROLE_";
 
     @Autowired
     public UserDetailsPermissionServiceImpl(UserService userService) {
@@ -42,7 +43,7 @@ public class UserDetailsPermissionServiceImpl implements UserDetailsService {
                 .collect(Collectors.toList())
         );
 
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name()));
+        authorities.add(new SimpleGrantedAuthority(ROLE_AUTHORITY_PREFIX + user.getUserRole().name()));
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
