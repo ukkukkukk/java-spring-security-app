@@ -33,7 +33,8 @@ public class JWTTokenVerifier extends OncePerRequestFilter {
         String authorizationHeader = httpServletRequest.getHeader("Authorization");
 
         if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
-            throw new IllegalStateException("Token is missing in header ");
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+            return;
         }
 
         try {
