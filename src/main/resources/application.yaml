@@ -12,6 +12,7 @@ spring:
 
 app:
   jwt-secret: "do-not-use-in-prod-instead-store-in-secret-store"
+  jwt-token-ttl: 3600
 
 ---
 spring:

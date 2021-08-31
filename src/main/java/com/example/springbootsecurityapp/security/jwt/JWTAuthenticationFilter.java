@@ -22,13 +22,15 @@ import java.util.Date;
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
 
+    private final Long jwtTTL;
     private final String jwtSecret;
     private final static String BEARER_TOKEN_PREFIX = "Bearer ";
     private final static String AUTHORITIES_CLAIM_FIELD_NAME = "authorities";
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, String jwtSecret) {
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, String jwtSecret, Long jwtTTL) {
         this.authenticationManager = authenticationManager;
         this.jwtSecret = jwtSecret;
+        this.jwtTTL = jwtTTL;
     }
 
     @Override
@@ -51,7 +53,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .setSubject(authResult.getName())
                 .claim(AUTHORITIES_CLAIM_FIELD_NAME, authResult.getAuthorities())
                 .setIssuedAt(Date.from(currentTime))
-                .setExpiration(Date.from(currentTime.plusSeconds(3600)))
+                .setExpiration(Date.from(currentTime.plusSeconds(jwtTTL)))
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
                 .compact();
 

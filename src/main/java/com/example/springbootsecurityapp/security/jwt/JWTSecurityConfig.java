@@ -25,6 +25,9 @@ public class JWTSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${app.jwt-secret}")
     private String jwtSecret;
 
+    @Value("${app.jwt-token-ttl}")
+    private Long jwtTTL;
+
     @Autowired
     public JWTSecurityConfig(@Qualifier("UserDetailsPermissionServiceDb") UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
@@ -35,7 +38,7 @@ public class JWTSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtSecret))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtSecret, jwtTTL))
                 .addFilterAfter(new JWTTokenVerifier(jwtSecret), JWTAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/h2-console", "/h2-console/**").permitAll()
